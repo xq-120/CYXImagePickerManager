@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
 
   s.license = 'MIT'
-  s.summary = '一句话搞定图片选择.'
+  s.summary = '图片选择器封装.'
   s.homepage = 'https://github.com/xq-120/CYXImagePickerManager.git'
   s.author = { 'xq-120' => '1204556447@qq.com' }
   s.source = { :git => 'https://github.com/xq-120/CYXImagePickerManager.git', :tag => s.version.to_s }

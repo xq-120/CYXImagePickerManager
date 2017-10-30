@@ -7,7 +7,7 @@
 //
 
 #import "CYXImagePickerManager.h"
-#import <XQSheet.h>
+#import <XQSheet/XQSheet.h>
 
 static CYXImagePickerManager *pickerManager;
 
