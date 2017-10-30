@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <TZImagePickerController/TZImagePickerController.h>
+#import "TZImagePickerController.h"
 #import <Photos/Photos.h>
 
 @interface CYXImagePickerManager : NSObject
