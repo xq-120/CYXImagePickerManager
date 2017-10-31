@@ -14,22 +14,7 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
   s.frameworks = 'Foundation', 'UIKit'
-  
-  s.default_subspec = 'Core'
 
-  s.subspec 'Core' do |core|
-    core.source_files = 'CYXImagePickerManager/CYXImagePickerManager.{h,m}'
-  end
-
-  s.subspec 'TZImagePickerController' do |picker|
-    picker.ios.deployment_target = '6.0'
-    picker.source_files = 'CYXImagePickerManager/TZImagePickerController/*'
-    picker.dependency 'CYXImagePickerManager/Core'
-    picker.dependency 'TZImagePickerController', '~> 1.9.3'
-    picker.xcconfig = {
-      'USER_HEADER_SEARCH_PATHS' => '$(inherited) $(SRCROOT)/TZImagePickerController/TZImagePickerController'
-    }
-  end
-
+  s.dependency 'TZImagePickerController', '~> 1.9.3'
 end
 
