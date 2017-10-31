@@ -18,21 +18,11 @@ Pod::Spec.new do |s|
   s.default_subspec = 'Core'
 
   s.subspec 'Core' do |core|
-    core.source_files = 'CYXImagePickerManager/*'
-  end
-
-  s.subspec 'XQSheet' do |sheet|
-    sheet.ios.deployment_target = '7.0'
-    sheet.source_files = 'CYXImagePickerManager/XQSheet/*.{h,m}'
-    sheet.dependency 'CYXImagePickerManager/Core'
-    sheet.dependency 'XQSheet', '~> 1.0.3'
-    sheet.xcconfig = {
-      'USER_HEADER_SEARCH_PATHS' => '$(inherited) $(SRCROOT)/XQSheet/XQSheet'
-    }
+    core.source_files = 'CYXImagePickerManager/CYXImagePickerManager.{h,m}'
   end
 
   s.subspec 'TZImagePickerController' do |picker|
-    picker.ios.deployment_target = '7.0'
+    picker.ios.deployment_target = '6.0'
     picker.source_files = 'CYXImagePickerManager/TZImagePickerController/*'
     picker.dependency 'CYXImagePickerManager/Core'
     picker.dependency 'TZImagePickerController', '~> 1.9.3'
