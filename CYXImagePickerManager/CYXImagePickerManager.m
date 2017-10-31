@@ -7,14 +7,21 @@
 //
 
 #import "CYXImagePickerManager.h"
-#import "XQSheet.h"
 
 static CYXImagePickerManager *pickerManager;
 
-@interface CYXImagePickerManager ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface CYXImagePickerManager () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property (nonatomic, strong) TZImagePickerController *pickerController;
 @property (nonatomic, strong) UIImagePickerController *takePhotoController;
+
+//从相册取图片
+@property (nonatomic, copy) void(^didFinishPickingImages)(TZImagePickerController *pickerController, NSArray *images);
+@property (nonatomic, copy) void(^didCancelPickingImages)(TZImagePickerController *pickerController);
+
+//拍照
+@property (nonatomic, copy) void(^didFinishTakePhoto)(UIImagePickerController *takePhotoController, UIImage *image);
+@property (nonatomic, copy) void(^didCancelTakePhoto)(UIImagePickerController *takePhotoController);
 
 @end
 
@@ -79,10 +86,9 @@ static CYXImagePickerManager *pickerManager;
     return _takePhotoController;
 }
 
-- (void)showImagePickerSheetWithTitle:(NSString *)title fromVC:(UIViewController *)vc imageCount:(NSUInteger)imageCnt allowEditSingleImg:(BOOL)allowEditSingleImg completion:(void (^)(NSArray<UIImage *> *))completionBlk
+- (void)showImagePickerWithType:(CYXImagePickerType)type fromVC:(UIViewController *)vc imageCount:(NSUInteger)imageCnt allowEditSingleImage:(BOOL)isAllowEdit didFinishBlk:(void (^)(NSArray<UIImage *> *))didFinishBlk didCancelBlk:(void (^)(void))didCancelBlk
 {
-    XQSheet *sheet = [XQSheet sheetWithType:XQSheetTypeSelect title:title subTitle:nil cancelButtonTitle:@"取消"];
-    [sheet addBtnWithTitle:@"从手机相册选择" configHandler:nil actionHandler:^(UIButton *button, NSString *buttonTitle, NSInteger buttonIndex) {
+    if (type == CYXImagePickerTypePickImage) {
         // 权限判断
         PHAuthorizationStatus authStatus = [[self class] photoLibraryAuthStatus];
         if (authStatus == PHAuthorizationStatusRestricted || authStatus == PHAuthorizationStatusDenied) {
@@ -90,30 +96,31 @@ static CYXImagePickerManager *pickerManager;
             return ; //第一次使用时未决定,系统会自动弹出.
         }
         
-        if (imageCnt == 1 && allowEditSingleImg) { //调用系统的照片选择
-            self.takePhotoController.allowsEditing = allowEditSingleImg;
+        if (imageCnt == 1 && isAllowEdit) { //调用系统的照片选择
+            self.takePhotoController.allowsEditing = isAllowEdit;
             self.takePhotoController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
             self.didFinishTakePhoto = ^(UIImagePickerController *takePhotoController, UIImage *image){
                 [takePhotoController dismissViewControllerAnimated:YES completion:^{
-                    if (completionBlk) completionBlk(@[image]);
+                    if (didFinishBlk) didFinishBlk(@[image]);
                 }];
             };
             self.didCancelTakePhoto = ^(UIImagePickerController *takePhotoController){
-                [takePhotoController dismissViewControllerAnimated:YES completion:nil];
+                [takePhotoController dismissViewControllerAnimated:YES completion:^{
+                    if (didCancelBlk) didCancelBlk();
+                }];
             };
             [vc presentViewController:self.takePhotoController animated:YES completion:nil];
         } else {
             self.pickerController.maxImagesCount = imageCnt;
             self.didFinishPickingImages = ^(TZImagePickerController *pickerController, NSArray *images){
-                if (completionBlk) completionBlk(images);
+                if (didFinishBlk) didFinishBlk(images);
             };
             self.didCancelPickingImages = ^(TZImagePickerController *pickerController){
                 [pickerController dismissViewControllerAnimated:YES completion:nil];
             };
             [vc presentViewController:pickerManager.pickerController animated:YES completion:nil];
         }
-    }];
-    [sheet addBtnWithTitle:@"拍一张" configHandler:nil actionHandler:^(UIButton *button, NSString *buttonTitle, NSInteger buttonIndex) {
+    } else if (type == CYXImagePickerTypeTakePhoto) {
         // 判断设备是否支持拍照
         if (![UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeCamera]) {
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"当前设备暂不支持拍照" preferredStyle:UIAlertControllerStyleAlert];
@@ -131,20 +138,20 @@ static CYXImagePickerManager *pickerManager;
         }
         
         // 拍照
-        self.takePhotoController.allowsEditing = allowEditSingleImg;
+        self.takePhotoController.allowsEditing = isAllowEdit;
         self.takePhotoController.sourceType = UIImagePickerControllerSourceTypeCamera;
         pickerManager.didFinishTakePhoto = ^(UIImagePickerController *takePhotoController, UIImage *image){
             [takePhotoController dismissViewControllerAnimated:YES completion:^{
-                if (completionBlk) completionBlk(@[image]);
+                if (didFinishBlk) didFinishBlk(@[image]);
             }];
         };
         self.didCancelTakePhoto = ^(UIImagePickerController *takePhotoController){
-            [takePhotoController dismissViewControllerAnimated:YES completion:nil];
+            [takePhotoController dismissViewControllerAnimated:YES completion:^{
+                if (didCancelBlk) didCancelBlk();
+            }];
         };
         [vc presentViewController:self.takePhotoController animated:YES completion:nil];
-    }];
-    
-    [sheet showSheet];
+    }
 }
 
 - (void)showGuideAuthAlertWithMessage:(NSString *)msg fromVC:(UIViewController *)vc

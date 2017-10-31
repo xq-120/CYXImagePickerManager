@@ -7,8 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "TZImagePickerController.h"
+#import <TZImagePickerController.h>
 #import <Photos/Photos.h>
+
+typedef NS_ENUM( NSInteger, CYXImagePickerType) {
+    CYXImagePickerTypePickImage,
+    CYXImagePickerTypeTakePhoto,
+};
 
 @interface CYXImagePickerManager : NSObject
 
@@ -16,18 +21,9 @@
 //默认图片来源sourceType为PhotoLibrary,默认图片可编辑(得到的将是一张系统编辑后的图片)
 @property (nonatomic, strong, readonly) UIImagePickerController *takePhotoController;
 
-//从相册取图片
-@property (nonatomic, copy) void(^didFinishPickingImages)(TZImagePickerController *pickerController, NSArray *images);
-@property (nonatomic, copy) void(^didCancelPickingImages)(TZImagePickerController *pickerController);
-
-//拍照
-@property (nonatomic, copy) void(^didFinishTakePhoto)(UIImagePickerController *takePhotoController, UIImage *image);
-@property (nonatomic, copy) void(^didCancelTakePhoto)(UIImagePickerController *takePhotoController);
-
 + (instancetype)sharedPickerManager;
 
-// 便捷使用方法,无需考虑是拍照还是从相册选择.
-- (void)showImagePickerSheetWithTitle:(NSString *)title fromVC:(UIViewController *)vc imageCount:(NSUInteger)imageCnt allowEditSingleImg:(BOOL)allowEditSingleImg completion:(void(^)(NSArray<UIImage *> *imgs))completionBlk;
+- (void)showImagePickerWithType:(CYXImagePickerType)type fromVC:(UIViewController *)vc imageCount:(NSUInteger)imageCnt allowEditSingleImage:(BOOL)isAllowEdit didFinishBlk:(void (^)(NSArray<UIImage *> *imgs))didFinishBlk didCancelBlk:(void (^)(void))didCancelBlk;
 
 // 相机是否可用
 + (BOOL)isCameraAvailable;
