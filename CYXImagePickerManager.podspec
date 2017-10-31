@@ -15,6 +15,8 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.frameworks = 'Foundation', 'UIKit'
 
+  s.source_files  = 'CYXImagePickerManager/*.{h,m}'
+
   s.dependency 'TZImagePickerController', '~> 1.9.3'
 end
 
