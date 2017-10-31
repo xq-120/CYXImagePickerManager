@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <TZImagePickerController.h>
 #import <Photos/Photos.h>
+#import "TZImagePickerController.h"
 
 typedef NS_ENUM( NSInteger, CYXImagePickerType) {
     CYXImagePickerTypePickImage,
